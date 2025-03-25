@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="styles.css">
+</head><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to the CSS file -->
+</head>
+
+<body>
+
+    <div class="login-container">
+        <h2>Create Profile</h2>
+        <form action="profile.html" method="POST">
+            <div class="input-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="input-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="input-group">
+                <label for="bio">Short Bio</label>
+                <textarea id="bio" name="bio" rows="3"></textarea>
+            </div>
+
+            <h3>Music Interest Survey</h3>
+
+            <div class="input-group">
+                <label>What are your favorite music genres? (Select all that apply)</label>
+                <input type="checkbox" id="rock" name="fav-genre" value="rock">
+                <label for="rock">Rock</label>
+                <input type="checkbox" id="pop" name="fav-genre" value="pop">
+                <label for="pop">Pop</label>
+                <input type="checkbox" id="hip-hop" name="fav-genre" value="hip-hop">
+                <label for="hip-hop">Hip-Hop</label>
+                <input type="checkbox" id="jazz" name="fav-genre" value="jazz">
+                <label for="jazz">Jazz</label>
+                <input type="checkbox" id="classical" name="fav-genre" value="classical">
+                <label for="classical">Classical</label>
+                <input type="checkbox" id="electronic" name="fav-genre" value="electronic">
+                <label for="electronic">Electronic</label>
+                <input type="checkbox" id="country" name="fav-genre" value="country">
+                <label for="country">Country</label>
+                <input type="checkbox" id="other" name="fav-genre" value="other">
+                <label for="other">Other</label>
+            </div>
+
+            <div class="input-group">
+                <label for="fav-artist">Who is your favorite artist or band?</label>
+                <input type="text" id="fav-artist" name="fav-artist" required>
+            </div>
+
+            <div class="input-group">
+                <label>How often do you listen to music?</label>
+                <input type="radio" id="daily" name="music-frequency" value="daily" required>
+                <label for="daily">Daily</label>
+                <input type="radio" id="weekly" name="music-frequency" value="weekly">
+                <label for="weekly">A few times a week</label>
+                <input type="radio" id="monthly" name="music-frequency" value="monthly">
+                <label for="monthly">Occasionally</label>
+            </div>
+
+            <div class="input-group">
+                <label for="mood-music">What mood do you usually listen to music in?</label>
+                <select id="mood-music" name="mood-music" required>
+                    <option value="">Select an option</option>
+                    <option value="happy">Happy / Upbeat</option>
+                    <option value="relaxed">Relaxed / Chill</option>
+                    <option value="sad">Sad / Emotional</option>
+                    <option value="motivated">Motivated / Workout</option>
+                    <option value="party">Party / Dance</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="fav-song">What is your current favorite song?</label>
+                <input type="text" id="fav-song" name="fav-song">
+            </div>
+
+            <button type="submit" class="btn">Sign Up</button>
+        </form>
+
+        <div class="signup">
+            Already have an account? <a href="index.html">Login here</a>
+        </div>
+    </div>
+
+</body>
+</html>
