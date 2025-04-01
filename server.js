@@ -1,36 +1,36 @@
-// server.js
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
+
+import express from 'express';
+import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Resolve __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // Middleware
 app.use(cors());
-app.use(bodyParser.json()); // To parse incoming JSON requests
+app.use(express.json());
 
-// Dummy user data (In a real application, you'd get this from a database)
-const users = [
-  { username: 'user1', password: 'password123' },
-  { username: 'user2', password: 'password456' }
-];
+// Serve static files from the "public" folder
+app.use(express.static(path.join(__dirname, 'public')));
 
-// POST endpoint for login
+// Dummy endpoints for login and signup
 app.post('/login', (req, res) => {
-  const { username, password } = req.body;
-
-  // Check if user exists and password is correct
-  const user = users.find((u) => u.username === username && u.password === password);
-
-  if (user) {
-    res.status(200).json({ message: 'Login successful', username: user.username });
-  } else {
-    res.status(401).json({ message: 'Invalid username or password' });
-  }
+  // Example: find user in your data store
+  // For demo purposes, we're simply returning success
+  res.status(200).json({ message: 'Login successful', username: 'John Doe' });
 });
 
-// Start server
+app.post('/signup', (req, res) => {
+  // Example: create user in your data store
+  // For demo purposes, we're simply echoing back the request body as the new user
+  res.status(200).json({ message: 'Signup successful', user: req.body });
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
