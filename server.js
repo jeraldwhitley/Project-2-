@@ -20,6 +20,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Dummy endpoints for login and signup
 app.post('/login', (req, res) => {
+  // Automatically approve any login
+  res.status(200).json({ success: true, redirectUrl: '/main.html' });
+});
+
   // Example: find user in your data store
   // For demo purposes, we're simply returning success
   res.status(200).json({ message: 'Login successful', username: 'John Doe' });
