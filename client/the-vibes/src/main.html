@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Recommendation App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Music Recommendation</h1>
+        <input type="text" id="search-bar" placeholder="Search songs...">
+    </header>
+    
+    <nav>
+        <button class="filter-btn" data-filter="genres">Genres</button>
+        <button class="filter-btn" data-filter="moods">Moods</button>
+        <button class="filter-btn" data-filter="your-songs">Your Songs</button>
+    </nav>
+    
+    <main id="song-list">
+        <!-- Songs will be dynamically loaded here -->
+    </main>
+    
+    <script src="script.js"></script>
+</body>
+</html>
