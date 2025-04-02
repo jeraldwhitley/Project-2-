@@ -1,0 +1,81 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f4f4f4;
+}
+
+header {
+    width: 100%;
+    background-color: #333;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+#search-bar {
+    width: 80%;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 5px;
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px;
+    background-color: #444;
+    width: 100%;
+}
+
+.filter-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #666;
+    color: white;
+}
+
+.filter-btn:hover {
+    background-color: #888;
+}
+
+#song-list {
+    width: 80%;
+    max-width: 800px;
+    margin: 20px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.song {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.song:last-child {
+    border-bottom: none;
+}
+
+.downvote-btn, .remove-btn {
+    background: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.downvote-btn:hover, .remove-btn:hover {
+    background: darkred;
+}
