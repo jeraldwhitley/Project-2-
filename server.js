@@ -5,7 +5,7 @@ import mysql from 'mysql2';
 import { fileURLToPath } from 'url';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 
 // Resolve __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -55,7 +55,7 @@ app.post('/login', (req, res) => {
     });
 });
 
-app.listen(port, '0.0.0.0', () => { 
+app.listen(port, () => { 
     console.log(`Server listening on port ${port}`);
 });
 
