@@ -5,7 +5,7 @@ import mysql from 'mysql2';
 import { fileURLToPath } from 'url';
 
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 // Resolve __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
