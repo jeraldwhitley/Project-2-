@@ -7,31 +7,22 @@ document.addEventListener("DOMContentLoaded", () => {
         const email = document.getElementById("email").value;
         const password = document.getElementById("password").value;
 
-        // Basic email validation
-        if (!email.includes("@") || !email.includes(".")) {
-            alert("Please enter a valid email address.");
-            return;
-        }
-
         try {
-            const response = await fetch("/login", {
+            // Send login data to the backend
+            await fetch("/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ email, password }), // Send login details
             });
 
-            const data = await response.json();
-
-            if (data.success) {
-                window.location.href = data.redirectUrl; // Redirect to main.html
-            } else {
-                alert("Invalid login. Please try again.");
-            }
+            // Redirect to main.html after sending data
+            window.location.href = "main.html";
         } catch (error) {
-            console.error("Login error:", error);
+            console.error("Error sending login data:", error);
             alert("An error occurred. Please try again.");
         }
     });
 });
+
