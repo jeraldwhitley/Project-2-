@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import './songsuggest.css';
 
 interface Song {
@@ -7,21 +7,29 @@ interface Song {
     albumImage: string;
 }
 
+interface Comment {
+    id: number;
+    songTitle: string;
+    text: string;
+}
+
 const CLIENT_ID = '8af6542b2cd3449c93103801e10a07f6';
 const CLIENT_SECRET = '5e63eea52cd7402696cbcafbfdb4ad5d';
+const API_URL = 'http://localhost:5000';
 
 function SongSuggest() {
     const [songs, setSongs] = useState<Song[]>([]);
-    const [comments, setComments] = useState<string[]>([]);
-    const [newComment, setNewComment] = useState<string>('');
+    const [comments, setComments] = useState<{ [key: string]: Comment[] }>({});
+    const [newComment, setNewComment] = useState<{ [key: string]: string }>({});
+    const [showComments, setShowComments] = useState<{ [key: string]: boolean }>({});
     const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
-    const [category, setCategory] = useState<string>('mood'); // Default to 'mood'
+    const [category, setCategory] = useState<string>('mood');
     const [error, setError] = useState<string | null>(null);
     const [accessToken, setAccessToken] = useState<string | null>(null);
     const [tokenExpiryTime, setTokenExpiryTime] = useState<number | null>(null);
 
-    // Request an access token using client credentials
+    // Fetch access token from Spotify API
     const fetchAccessToken = async () => {
         const response = await fetch('https://accounts.spotify.com/api/token', {
             method: 'POST',
@@ -31,165 +39,167 @@ function SongSuggest() {
             },
             body: 'grant_type=client_credentials',
         });
-
         const data = await response.json();
-
         if (data.access_token) {
             setAccessToken(data.access_token);
-            setTokenExpiryTime(Date.now() + data.expires_in * 1000); // Set token expiry time
+            setTokenExpiryTime(Date.now() + data.expires_in * 1000);
         } else {
             console.error('Failed to get access token');
         }
     };
 
-    // Get the current access token, and refresh if expired
     const getAccessToken = async () => {
         if (accessToken && tokenExpiryTime && Date.now() < tokenExpiryTime) {
-            return accessToken; // Return current token if it hasn't expired
+            return accessToken;
         }
-        await fetchAccessToken(); // Fetch a new token if expired or doesn't exist
+        await fetchAccessToken();
         return accessToken;
     };
 
-    // Shuffle the song array
+    // Shuffle songs randomly
     const shuffleArray = (array: any[]) => {
-        let shuffledArray = [...array];
-        for (let i = shuffledArray.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
-        }
-        return shuffledArray;
+        return array.sort(() => Math.random() - 0.5);
     };
 
-    // Fetch songs from Spotify based on category (mood or genre)
+    // Fetch songs from Spotify
     const fetchSongsFromSpotify = async () => {
         setLoading(true);
-    
-        let valence = 0.5;  // Default to neutral valence
-        let energy = 0.5;   // Default to neutral energy
-    
-        let url = '';  // Default to empty URL
-    
+        let valence = 0.5, energy = 0.5;
+        let url = '';
+
         if (category === 'genre') {
-            // If querying by genre, create the search query for genre
             url = `https://api.spotify.com/v1/search?q=genre:${encodeURIComponent(searchQuery)}&type=track&limit=20`;
         }
-    
+
         if (category === 'mood') {
-            // Adjust valence and energy based on the mood selected
-            if (searchQuery === "happy") {
-                valence = 0.7;  // Positive valence for happy mood
-                energy = 0.6;   // Medium energy for happy mood
-            } else if (searchQuery === "sad") {
-                valence = 0.2;  // Low valence for sad mood
-                energy = 0.3;   // Low energy for sad mood
-            } else if (searchQuery === "angry") {
-                valence = 0.3;  // Low valence for angry mood
-                energy = 0.8;   // High energy for angry mood
-            } else if (searchQuery === "chill") {
-                valence = 0.6;  // Medium-high valence for chill mood
-                energy = 0.4;   // Low energy for chill mood
-            } else {
+            if (searchQuery === "happy") { valence = 0.7; energy = 0.6; }
+            else if (searchQuery === "sad") { valence = 0.2; energy = 0.3; }
+            else if (searchQuery === "angry") { valence = 0.3; energy = 0.8; }
+            else if (searchQuery === "chill") { valence = 0.6; energy = 0.4; }
+            else {
                 setError("Invalid mood. Try happy, sad, angry, or chill.");
                 setLoading(false);
                 return;
             }
-    
-            // Construct the URL for mood-based recommendations
-            url = `https://api.spotify.com/v1/search?q=genre:pop&target_valence=${valence}&target_energy=${energy}&type=track&limit=20`
+            url = `https://api.spotify.com/v1/search?q=genre:pop&target_valence=${valence}&target_energy=${energy}&type=track&limit=20`;
         }
-    
+
         if (!url) {
             setError("Please select a valid category and enter a valid search query.");
             setLoading(false);
             return;
         }
-    
+
         try {
             const token = await getAccessToken();
             if (!token) throw new Error('No valid access token found!');
-    
-            // Log the URL and token to make sure they are correct
-            console.log('Making API request with token:', token);
-            console.log('Using URL:', url);
-    
-            const response = await fetch(url, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-    
+
+            const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
             if (!response.ok) throw new Error('Failed to fetch songs from Spotify');
-    
+
             const data = await response.json();
-            const tracks = data.tracks.items;
-    
-            // Shuffle the fetched songs
-            const shuffledTracks = shuffleArray(tracks);
-    
+            const shuffledTracks = shuffleArray(data.tracks.items);
+
             const songList = shuffledTracks.map((track: any) => ({
                 title: track.name,
                 artist: track.artists[0].name,
                 albumImage: track.album.images[0].url,
             }));
-    
+
             setSongs(songList);
         } catch (error: unknown) {
-            if (error instanceof Error) {
-                console.error('Error fetching song:', error);
-                setError('Error fetching song: ' + error.message); 
-            } else {
-                console.error('An unknown error occurred', error);
-                setError('An unknown error occurred');
-            }
+            setError(error instanceof Error ? error.message : 'An unknown error occurred');
             setSongs([]);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchQuery(e.target.value);
-    };
-
-    const handleCategoryChange = (type: string) => {
-        setCategory(type);
-        setSearchQuery('');  // Clear search query when changing category
-    };
-
-    const handleAddComment = () => {
-        if (newComment.trim()) {
-            setComments([...comments, newComment]);
-            setNewComment('');
+    // Fetch comments for a specific song
+    const fetchComments = async (songTitle: string) => {
+        try {
+            const response = await fetch(`${API_URL}/comments/${encodeURIComponent(songTitle)}`);
+            const data = await response.json();
+            setComments((prev) => ({ ...prev, [songTitle]: data }));
+        } catch (error) {
+            console.error('Error fetching comments:', error);
         }
     };
 
-    useEffect(() => {
-        fetchAccessToken(); // Get the access token when the component mounts
+    // Handle adding a comment
+    // Handle adding a comment
+    const handleAddComment = async (songTitle: string) => {
+        if (!newComment[songTitle]?.trim()) return;
 
+        try {
+            // Send the comment to the server
+            const response = await fetch(`${API_URL}/comments`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ songTitle, comment: newComment[songTitle] }),
+            });
+
+            if (response.ok) {
+                // Directly update the local comments state
+                const newCommentObj: Comment = {
+                    id: Date.now(),
+                    songTitle,
+                    text: newComment[songTitle],
+                };
+
+                // Update comments for the current song
+                setComments((prev) => ({
+                    ...prev,
+                    [songTitle]: [...(prev[songTitle] || []), newCommentObj], // Add the new comment to the song's comment array
+                }));
+
+                // Clear the input field for the new comment
+                setNewComment((prev) => ({ ...prev, [songTitle]: '' }));
+            }
+        } catch (error) {
+            console.error('Error adding comment:', error);
+        }
+    };
+
+
+    // Toggle visibility of comments
+    const toggleComments = (songTitle: string) => {
+        setShowComments((prev) => ({
+            ...prev,
+            [songTitle]: !prev[songTitle],
+        }));
+    };
+
+    // Initialize Spotify access token and refresh interval
+    useEffect(() => {
+        fetchAccessToken();
         const refreshInterval = setInterval(() => {
-            // Refresh the access token if it's close to expiry (e.g., every 55 minutes)
             if (tokenExpiryTime && Date.now() > tokenExpiryTime - 60000) {
                 fetchAccessToken();
             }
-        }, 60 * 1000); // Check token expiry every 1 minute
-
-        return () => clearInterval(refreshInterval); // Clean up the interval on component unmount
+        }, 60 * 1000);
+        return () => clearInterval(refreshInterval);
     }, []);
+
+    // Fetch comments for each song when songs are updated
+    useEffect(() => {
+        songs.forEach((song) => fetchComments(song.title));
+    }, [songs]);
 
     return (
         <div className="song-suggest-container">
             <h1>What's your vibe?</h1>
 
             <div className="category-buttons">
-                <button onClick={() => handleCategoryChange('mood')}>Mood</button>
-                <button onClick={() => handleCategoryChange('genre')}>Genre</button>
+                <button onClick={() => setCategory('mood')}>Mood</button>
+                <button onClick={() => setCategory('genre')}>Genre</button>
             </div>
 
             <div className="search-bar">
                 <input
-                    className="search"
                     type="text"
                     value={searchQuery}
-                    onChange={handleSearchChange}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder={`Search for a song by ${category}`}
                 />
                 <button onClick={fetchSongsFromSpotify}>Search</button>
@@ -198,49 +208,42 @@ function SongSuggest() {
             {loading && <p>Loading...</p>}
             {error && <p style={{ color: 'red' }}>{error}</p>}
 
-            <div className="song-suggestions-header">
-                <h2>Suggested Songs:</h2>
-            </div>
+            <div className="song-list">
+                {songs.map((song) => (
+                    <div key={song.title} className="song-item">
+                        <img src={song.albumImage} alt={song.title} className="album-image" />
+                        <div>
+                            <h3>{song.title}</h3>
+                            <p>{song.artist}</p>
+                        </div>
 
-            {songs.length > 0 ? (
-                <div className="song-list">
-                    <ul>
-                        {songs.map((song, index) => (
-                            <li key={index} className="song-item">
-                                <img src={song.albumImage} alt={song.title} className="album-image" />
-                                <div>
-                                    <h3>{song.title}</h3>
-                                    <p>{song.artist}</p>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            ) : (
-                <p>{songs.length === 0 && 'No songs found. Try another search.'}</p>
-            )}
+                        <button onClick={() => toggleComments(song.title)}>
+                            {showComments[song.title] ? 'Hide Comments' : 'Show Comments'}
+                        </button>
 
-            <div className="comment-section">
-                <h3>Comments:</h3>
-                <ul>
-                    {comments.map((comment, index) => (
-                        <li key={index}>{comment}</li>
-                    ))}
-                </ul>
-                <div className="add-comment">
-                    <input
-                        type="text"
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="Add a comment..."
-                    />
-                    <button onClick={handleAddComment}>Add Comment</button>
-                </div>
+                        {showComments[song.title] && (
+                            <div className="comment-section">
+                                <ul>
+                                    {comments[song.title]?.map((comment) => (
+                                        <li key={comment.id}>{comment.text}</li>
+                                    ))}
+                                </ul>
+                                <input
+                                    type="text"
+                                    value={newComment[song.title] || ''}
+                                    onChange={(e) =>
+                                        setNewComment((prev) => ({ ...prev, [song.title]: e.target.value }))
+                                    }
+                                    placeholder="Add a comment..."
+                                />
+                                <button onClick={() => handleAddComment(song.title)}>Add Comment</button>
+                            </div>
+                        )}
+                    </div>
+                ))}
             </div>
         </div>
     );
 }
 
 export default SongSuggest;
-
-
