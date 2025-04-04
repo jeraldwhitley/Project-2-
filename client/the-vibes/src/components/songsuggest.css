@@ -1,3 +1,6 @@
+body{
+    background: linear-gradient(to bottom, #94d0fd, #ffffff);;
+}
 .song-suggest-container {
     font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
     text-align: center;
@@ -175,6 +178,9 @@ ul {
     height: 80% ;
     border-radius: 8px;
     margin-bottom: 10px;
+}
+h2{
+    font-family: 'Poppins', sans-serif;
 }
 
 h3, p {
