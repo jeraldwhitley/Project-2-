@@ -177,7 +177,7 @@ function SongSuggest() {
 
     return (
         <div className="song-suggest-container">
-            <h1>Song Suggestion</h1>
+            <h1>What's your vibe?</h1>
 
             <div className="category-buttons">
                 <button onClick={() => handleCategoryChange('mood')}>Mood</button>
